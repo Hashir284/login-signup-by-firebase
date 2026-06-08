@@ -9,6 +9,7 @@ import {
 
 const Signup = () => {
   const auth = getAuth();
+
   const [email, semail] = useState("");
   const [password, spassword] = useState("");
   const [name, sname] = useState("");
@@ -20,21 +21,33 @@ const Signup = () => {
     } else if (password.length >= 8) {
       createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-          // Signed up
+          updateProfilee()
           const user = userCredential.user;
-          console.log(user);
+          // console.log(user);
           window.location = "/dashboard";
-          // auth.currentUser = name
         })
         .catch((error) => {
           const errorCode = error.code;
           const errorMessage = error.message;
-          // console.log(userCredential);
         });
     } else {
       alert("Password must great than or equal to 8");
     }
+
   };
+ 
+  const updateProfilee =()=>{
+    updateProfile(auth.currentUser, {
+  displayName: name, photoURL: "https://www.pinterest.com/pin/619456123721660825/"
+}).then(() => {
+  // Profile updated!
+  // ...
+}).catch((error) => {
+  // An error occurred
+  // ...
+});
+}
+
 
   return (
     <div className="container">

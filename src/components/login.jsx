@@ -1,32 +1,42 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./log.css";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { log } from "firebase/firestore/pipelines";
 
 const Login = () => {
   const [email, semail] = useState("");
   const [password, spassword] = useState("");
 
+  const navigate = useNavigate();
   const auth = getAuth();
+
+  const checkTrim = () => {
+    if (email.trim() === "" || password.trim() === "") {
+      alert("Plz! fill all fields");
+      return false;
+    } else {
+      return true;
+    }
+  };
 
   const submitData = (e) => {
     e.preventDefault();
-    if (email.trim() === "" || password.trim() === "") {
-      alert("Plz! fill all fields");
-    } else {
+    let checkEmpty = checkTrim();
+
+    if (checkEmpty) {
       signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-          window.location = "/dashboard";
-          // Signed in
-          const user = userCredential.user;
-          console.log(user);
           semail("");
           spassword("");
+          const user = userCredential.user;
+          // console.log(user);
+          setTimeout(() => {
+            navigate("/");
+          }, 5000);
         })
         .catch((error) => {
           alert("Incorrect Email or Password");
-          const errorCode = error.code;
-          const errorMessage = error.message;
           console.log("errorMessage", error.code);
           console.log("errorCode", error.message);
         });
@@ -36,9 +46,10 @@ const Login = () => {
   return (
     <div className="container">
       <h2>Login</h2>
-      <form onSubmit={submitData}>
+      <form onSubmit={submitData} autoComplete="off">
         <div>
           <label>Email</label>
+
           <input
             type="email"
             value={email}
@@ -49,8 +60,10 @@ const Login = () => {
             }}
           />
         </div>
+
         <div>
           <label>Password</label>
+
           <input
             value={password}
             type="password"
@@ -61,6 +74,7 @@ const Login = () => {
             }}
           />
         </div>
+
         <div>
           <button type={"submit"}>Login</button>
         </div>

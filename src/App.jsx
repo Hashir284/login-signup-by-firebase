@@ -4,12 +4,13 @@ import Signup from "./components/signup";
 import Dashboard from "./components/dashboard";
 import { initializeApp } from "firebase/app";
 import { Navigate, Route, Routes } from "react-router";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import { useEffect, useState } from "react";
+import firebase from "firebase/compat/app";
 
 function App() {
   const [userLoggedIn, setUserLoggedIn] = useState(null);
-  console.log(userLoggedIn);
+  // console.log(userLoggedIn);
   const firebaseConfig = {
     apiKey: "AIzaSyCjueCq4DqttJW0yqR0LG1MiBz-XfbhHBg",
     authDomain: "login-signup-24a03.firebaseapp.com",
@@ -27,12 +28,10 @@ function App() {
     {
       onAuthStateChanged(auth, (user) => {
         if (user) {
-          console.log(user);
-
           // User is signed in, see docs for a list of available properties
           // https://firebase.google.com/docs/reference/js/auth.user
           const uid = user.uid;
-          console.log(user);
+          // console.log(user);
           setUserLoggedIn(true);
           // ...
         } else {
@@ -49,7 +48,12 @@ function App() {
   }
 
   const change = () => {
-    setUserLoggedIn(false);
+    signOut(auth)
+    .then(()=>{
+      setUserLoggedIn(false)
+    }).catch(err=>{
+      console.log('error',err);
+    })
   };
 
   return (
