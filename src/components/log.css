@@ -2,7 +2,6 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: Poppins, sans-serif;
 }
 
 body {
@@ -10,7 +9,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    background: #f3f4f6;
+    background: #DBDCDE;
 } 
 
 .container {
@@ -51,7 +50,7 @@ input {
 
 input:focus {
     outline: none;
-    border-color: #3b82f6;
+    border-color: #53E7E2;
     background: white;
 }
 
@@ -60,16 +59,16 @@ button {
     padding: 14px;
     border: none;
     border-radius: 8px;
-    background: #3b82f6;
+    background: #53E7E2;
     color: white;
     font-size: 16px;
     cursor: pointer;
     transition: 0.3s;
 }
 
-button:hover {
+/* button:hover {
     background: #2563eb;
-}
+} */
 
 .link {
     text-align: center;
@@ -78,9 +77,16 @@ button:hover {
 
 .link a {
     text-decoration: none;
-    color: #3b82f6;
+    color: #53E7E2;
 }
 
 .link a:hover {
     text-decoration: underline;
+}
+
+.forget, .signup{
+    margin-bottom: 12px;
+}
+.or{
+    margin-bottom: 17px;
 }

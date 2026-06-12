@@ -1,0 +1,89 @@
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body{
+    background: #DBDCDE;
+}
+
+/* .card{
+}     */
+    .grey{
+        background: #404042;
+        height: 30px;
+        width: 500px;
+    }
+    .shade-green{
+        background: #7ACAC7;
+        height: 90px;
+    }
+    .details{
+        text-align: center;
+        background: #FFFFFF;
+        padding: 40px 30px 40px;
+        position: relative;
+        /* bg */
+    }
+
+
+
+    .details h2{
+        margin-bottom: 0;
+    }
+
+    .details img{
+        position: absolute;
+        width: 105px;
+        height: 105px;
+        border-radius: 50%;
+        display: inline-block;
+        top: -93px;
+        right: 50%;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 6px solid white;
+    }
+
+    .details p{
+        color: #7ACAC7;
+        line-height: 1.9;
+        font-weight: 540;
+    }
+
+    .details p span{
+        color: #b6b6b6;
+    }
+
+    .details button{
+        background-color: #464C4F;
+        width: 90px;
+        display: inline-block;
+        margin: 20px;
+    }
+
+    .fa-pen{
+        margin-top: -300px;
+        background-color: gold;
+        border-radius: 50%;
+        padding: 5px;
+        font-size: 10px;
+        display: inline-block;
+    }
+
+    .links, button.verify{
+        text-decoration: underline;
+        color: #7ACAC7 !important;
+    }
+    .links a:visited, button.verify{
+        text-decoration: underline;
+        color: #53e7e2 !important;
+    }
+
+    button.verify{
+        background-color: transparent;
+white-space: nowrap;
+margin: 0;padding: 0;
+    }
+

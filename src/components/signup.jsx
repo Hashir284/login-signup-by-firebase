@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./sign.css";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import {
   updateProfile,
   getAuth,
@@ -9,45 +9,72 @@ import {
 
 const Signup = () => {
   const auth = getAuth();
+  const navigate = useNavigate();
 
   const [email, semail] = useState("");
   const [password, spassword] = useState("");
   const [name, sname] = useState("");
+  const [login, slogin] = useState(false);
+  // const
 
   const submitData = (e) => {
     e.preventDefault();
+    // slogin(true);
+    // const user = auth.currentUser.emailVerified
+
     if (email.trim() === "" || password.trim() === "" || name.trim() === "") {
       alert("Plz! fill all fields");
     } else if (password.length >= 8) {
       createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-          updateProfilee()
+          updateProfile(auth.currentUser, {
+            displayName: name,
+            photoURL: "",
+          })
+            .then(() => {
+              // Profile updated!
+              // ...
+            })
+            .catch((error) => {
+              // An error occurred
+              // ...
+            });
+          auth.currentUser.displayName = name;
           const user = userCredential.user;
-          // console.log(user);
-          window.location = "/dashboard";
+          navigate("/");
+          slogin(true);
         })
         .catch((error) => {
           const errorCode = error.code;
           const errorMessage = error.message;
+          console.log(error);
+          console.log(error.code);
+          console.log(error.message);
+          alert(error.code);
         });
     } else {
       alert("Password must great than or equal to 8");
     }
-
   };
- 
-  const updateProfilee =()=>{
-    updateProfile(auth.currentUser, {
-  displayName: name, photoURL: "https://www.pinterest.com/pin/619456123721660825/"
-}).then(() => {
-  // Profile updated!
-  // ...
-}).catch((error) => {
-  // An error occurred
-  // ...
-});
-}
 
+  const Profile = () => {
+    updateProfile(auth.currentUser, {
+      displayName: name,
+      photoURL: "",
+    })
+      .then(() => {
+        // Profile updated!
+        // ...
+      })
+      .catch((error) => {
+        // An error occurred
+        // ...
+      });
+  };
+
+  if (login) {
+    return <h1>Loading...</h1>;
+  }
 
   return (
     <div className="container">
