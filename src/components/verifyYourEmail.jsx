@@ -22,6 +22,7 @@ const VerifyYourEmail = () => {
             navigate('/')
           })
           .catch((error) => {
+            console.log(error);
             // An error occurred
             // ...
           });

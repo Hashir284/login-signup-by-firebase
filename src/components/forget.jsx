@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./log.css";
+import { useNavigate } from "react-router";
 import { Link } from "react-router";
 import { getAuth, sendPasswordResetEmail } from "firebase/auth";
 
@@ -7,12 +8,16 @@ const Forget = () => {
   const auth = getAuth();
   const [email, semail] = useState("");
 
-  const forget = () => {
+  const navigate = useNavigate()
+
+  const forget = (e) => {
+    e.preventDefault()
     sendPasswordResetEmail(auth, email)
       .then(() => {
         alert('check your email')
         // Password reset email sent!
         // ..
+        navigate('/')
       })
       .catch((error) => {
         const errorCode = error.code;
@@ -22,6 +27,7 @@ const Forget = () => {
         
         // ..
       });
+
   };
 
   return (

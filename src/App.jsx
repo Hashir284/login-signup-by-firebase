@@ -8,10 +8,16 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useEffect, useState } from "react";
 import VerifyYourEmail from "./components/verifyYourEmail";
 import auth from "./initializeApp";
+import { initializeApp } from "firebase/app";
+import Home from "./components/home";
+
 
 function App() {
-  const [userLoggedIn, setUserLoggedIn] = useState(null);
+  
 
+  // https://www.flaticon.com/free-icon/profile_3135715
+  const [userLoggedIn, setUserLoggedIn] = useState(null);
+  // https://internship-portfolio-deploy.netlify.app/
   useEffect(() => {
       onAuthStateChanged(auth, (user) => {
         if (user) {
@@ -27,12 +33,6 @@ function App() {
       });
   }, []);
 
-
-  if (userLoggedIn === null) {
-    return <h1>Loading</h1>;
-  }
-
-
   const change = () => {
     signOut(auth)
       .then(() => {
@@ -43,7 +43,10 @@ function App() {
       });
   };
 
-  
+  if (userLoggedIn === null) {
+    return <h1>Loading</h1>;
+  }
+ 
   return (
     <div className="App">
       {userLoggedIn ? (
@@ -53,6 +56,9 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="*" element={<Navigate to={"/"} />} />
+          {auth.currentUser.emailVerified && auth.currentUser.photoURL
+                ? <Route path="/home" element={<Home />} />
+                : null}
         </Routes>
       ) : (
         <Routes>

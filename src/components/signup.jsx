@@ -41,12 +41,12 @@ const Signup = () => {
             });
           auth.currentUser.displayName = name;
           const user = userCredential.user;
+          console.log(user);
+          
           navigate("/");
           slogin(true);
         })
         .catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
           console.log(error);
           console.log(error.code);
           console.log(error.message);
@@ -57,20 +57,20 @@ const Signup = () => {
     }
   };
 
-  const Profile = () => {
-    updateProfile(auth.currentUser, {
-      displayName: name,
-      photoURL: "",
-    })
-      .then(() => {
-        // Profile updated!
-        // ...
-      })
-      .catch((error) => {
-        // An error occurred
-        // ...
-      });
-  };
+  // const Profile = () => {
+  //   updateProfile(auth.currentUser, {
+  //     displayName: name,
+  //     photoURL: "",
+  //   })
+  //     .then(() => {
+  //       // Profile updated!
+  //       // ...
+  //     })
+  //     .catch((error) => {
+  //       // An error occurred
+  //       // ...
+  //     });
+  // };
 
   if (login) {
     return <h1>Loading...</h1>;

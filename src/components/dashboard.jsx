@@ -4,16 +4,19 @@ import {
 } from "firebase/auth";
 import "./dashboard.css";
 import { Link } from "react-router";
+import { useState } from "react";
 
 
 const Dashboard = ({ change }) => {
   const auth = getAuth();
   const id = auth.currentUser.uid;
   const email = auth.currentUser.email;
-  const emailVerified = (
+  const [emailVerified, semailVerified] = useState(
     auth.currentUser.emailVerified
   );
     console.log(auth.currentUser.displayName);
+    console.log(auth.currentUser.uid);
+    console.log(auth.currentUser.photoURL);
 
 
   const verify = () => {
@@ -25,7 +28,14 @@ const Dashboard = ({ change }) => {
         console.log(error);
         alert('Check your Email')
       });
+      if(!emailVerified){
+      setInterval(()=>{
+        semailVerified(auth.currentUser.emailVerified)
+        console.log(auth.currentUser.emailVerified);
+      }
+    ,3000)
   };
+}
 
   return (
     <div>
@@ -35,7 +45,7 @@ const Dashboard = ({ change }) => {
         <div className="details">
           <h2>{auth.currentUser.displayName}</h2>
           {auth.currentUser.photoURL ? (
-            (<img src={auth.currentUser.photoURL} alt="User Profile Pic" />)
+            (<img src={auth.currentUser.photoURL} alt="User Profile" />)
           ) : null}
           <p>
             Email: <span>{email}</span>
@@ -55,7 +65,12 @@ const Dashboard = ({ change }) => {
                 : "Upload your profile picture"}
             </Link>
             <br />
-            <br />
+            <br />  
+           
+              {auth.currentUser.emailVerified && auth.currentUser.photoURL
+                ?  <Link to='/home'>Go to Home Page </Link>
+                : <div>Please Verify your Account to Home Page</div>}
+           
           </span>
                 {!emailVerified ? <p>
   Email verification is pending.
