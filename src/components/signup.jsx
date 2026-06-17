@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./sign.css";
+import "./CSS/sign.css";
 import { Link, useNavigate } from "react-router";
 import {
   updateProfile,
@@ -15,12 +15,9 @@ const Signup = () => {
   const [password, spassword] = useState("");
   const [name, sname] = useState("");
   const [login, slogin] = useState(false);
-  // const
 
   const submitData = (e) => {
     e.preventDefault();
-    // slogin(true);
-    // const user = auth.currentUser.emailVerified
 
     if (email.trim() === "" || password.trim() === "" || name.trim() === "") {
       alert("Plz! fill all fields");
@@ -50,7 +47,6 @@ const Signup = () => {
           console.log(error);
           console.log(error.code);
           console.log(error.message);
-          alert(error.code);
         });
     } else {
       alert("Password must great than or equal to 8");

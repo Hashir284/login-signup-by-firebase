@@ -1,41 +1,33 @@
-import {
-  getAuth,
-  sendEmailVerification
-} from "firebase/auth";
-import "./dashboard.css";
+import { getAuth, sendEmailVerification } from "firebase/auth";
+import "./CSS/dashboard.css";
 import { Link } from "react-router";
 import { useState } from "react";
-
 
 const Dashboard = ({ change }) => {
   const auth = getAuth();
   const id = auth.currentUser.uid;
   const email = auth.currentUser.email;
   const [emailVerified, semailVerified] = useState(
-    auth.currentUser.emailVerified
+    auth.currentUser.emailVerified,
   );
-    console.log(auth.currentUser.displayName);
-    console.log(auth.currentUser.uid);
-    console.log(auth.currentUser.photoURL);
-
+  console.log(auth.currentUser.photoURL);
 
   const verify = () => {
     sendEmailVerification(auth.currentUser)
-    .then(() => {
-        alert('Check your Email')
+      .then(() => {
+        alert("Check your Email");
       })
       .catch((error) => {
         console.log(error);
-        alert('Check your Email')
+        alert("Check your Email");
       });
-      if(!emailVerified){
-      setInterval(()=>{
-        semailVerified(auth.currentUser.emailVerified)
+    if (!emailVerified) {
+      setInterval(() => {
+        semailVerified(auth.currentUser.emailVerified);
         console.log(auth.currentUser.emailVerified);
-      }
-    ,3000)
+      }, 300);
+    }
   };
-}
 
   return (
     <div>
@@ -45,7 +37,10 @@ const Dashboard = ({ change }) => {
         <div className="details">
           <h2>{auth.currentUser.displayName}</h2>
           {auth.currentUser.photoURL ? (
-            (<img src={auth.currentUser.photoURL} alt="User Profile" />)
+            <img src={auth.currentUser.photoURL} alt="User Profile" referrerPolicy="no-referrer" loading="lazy"
+  onError={(e) => {
+    e.target.src = "/4.png";
+  }} />
           ) : null}
           <p>
             Email: <span>{email}</span>
@@ -65,26 +60,26 @@ const Dashboard = ({ change }) => {
                 : "Upload your profile picture"}
             </Link>
             <br />
-            <br />  
-           
-              {auth.currentUser.emailVerified && auth.currentUser.photoURL
-                ?  <Link to='/home'>Go to Home Page </Link>
-                : <div>Please Verify your Account to Home Page</div>}
-           
+            <br />
+
+            {auth.currentUser.emailVerified && auth.currentUser.photoURL ? (
+              <Link to="/home">Go to Home Page </Link>
+            ) : (
+              <div>Please Verify your Account to Home Page</div>
+            )}
           </span>
-                {!emailVerified ? <p>
-  Email verification is pending.
-    <button className="verify" onClick={verify}>Verify now</button>
-</p> : null}
- </div>
+          {!emailVerified ? (
+            <p>
+              Email verification is pending.
+              <button className="verify" onClick={verify}>
+                Verify now
+              </button>
+            </p>
+          ) : null}
+        </div>
         <div className="grey"></div>
       </div>
     </div>
-    // <div>
-    //   <h1>Dashboard</h1>
-    //   <br />
-    // <button onClick={verify}>Verify you Email</button>
-    // </div>
   );
 };
 

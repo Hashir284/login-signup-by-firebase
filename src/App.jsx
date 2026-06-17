@@ -8,16 +8,12 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useEffect, useState } from "react";
 import VerifyYourEmail from "./components/verifyYourEmail";
 import auth from "./initializeApp";
-import { initializeApp } from "firebase/app";
 import Home from "./components/home";
 
 
 function App() {
-  
-
-  // https://www.flaticon.com/free-icon/profile_3135715
   const [userLoggedIn, setUserLoggedIn] = useState(null);
-  // https://internship-portfolio-deploy.netlify.app/
+  
   useEffect(() => {
       onAuthStateChanged(auth, (user) => {
         if (user) {

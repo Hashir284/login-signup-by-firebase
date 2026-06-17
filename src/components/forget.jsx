@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./log.css";
+import "./CSS/log.css";
 import { useNavigate } from "react-router";
 import { Link } from "react-router";
 import { getAuth, sendPasswordResetEmail } from "firebase/auth";
@@ -20,11 +20,8 @@ const Forget = () => {
         navigate('/')
       })
       .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log(errorCode);
-        console.log(errorMessage);
-        
+        console.log(error.code);
+        console.log(error.message); 
         // ..
       });
 
@@ -54,6 +51,7 @@ const Forget = () => {
       </form>
 
       <div className="link">
+        <Link ></Link>
         <Link to={"/login"}>Login with you account</Link>
         <br />
       </div>

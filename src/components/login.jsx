@@ -1,18 +1,14 @@
 import React, { useState } from "react";
-import "./log.css";
+import "./CSS/log.css";
 import { Link, useNavigate } from "react-router";
 import { getAuth, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 
 const Login = () => {
   const [email, semail] = useState("");
   const [password, spassword] = useState("");
-
   const navigate = useNavigate();
   const auth = getAuth();
   const provider = new GoogleAuthProvider();
-
-
-  // console.log(auth);
 
   const checkTrim = () => {
     if (email.trim() === "" || password.trim() === "") {
@@ -37,7 +33,6 @@ const Login = () => {
           }, 5000);
         })
         .catch((error) => {
-          alert("Incorrect Email or Password");
           console.log("errorMessage", error.code);
           console.log("errorCode", error.message);
         });
@@ -47,23 +42,11 @@ const Login = () => {
   const contineWithGoogle = () =>{
 signInWithPopup(auth, provider)
   .then((result) => {
-    // This gives you a Google Access Token. You can use it to access the Google API.
     const credential = GoogleAuthProvider.credentialFromResult(result);
-    console.log(credential);
-    // const token = credential.accessToken;
-    // The signed-in user info.
-    // const user = result.user;
-    // IdP data available using getAdditionalUserInfo(result)
-    // ...
+    const token = credential.accessToken;
+    const user = result.user;
   }).catch((error) => {
-    // Handle Errors here.
-    // const errorCode = error.code;
-    // const errorMessage = error.message;
-    // The email of the user's account used.
-    // const email = error.customData.email;
-    // The AuthCredential type that was used.
-    // const credential = GoogleAuthProvider.credentialFromError(error);
-    // ...
+    console.log(error)
   });
   }
   
