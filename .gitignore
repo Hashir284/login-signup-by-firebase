@@ -8,8 +8,7 @@
 # testing
 /coverage
 
-#  // https://www.flaticon.com/free-icon/profile_3135715
-#  // https://internship-portfolio-deploy.netlify.app/
+
 # production
 /build
 
