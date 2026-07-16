@@ -1,4 +1,4 @@
-* {
+/* * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -66,27 +66,27 @@ button {
     transition: 0.3s;
 }
 
-/* button:hover {
-    background: #2563eb;
-} */
 
 .link {
     text-align: center;
     margin-top: 18px;
-}
+    }
 
-.link a {
-    text-decoration: none;
-    color: #53E7E2;
-}
-
-.link a:hover {
-    text-decoration: underline;
-}
+    .link a {
+        text-decoration: none;
+        color: #53E7E2;
+        }
+        
+        .link a:hover {
+            text-decoration: underline;
+            }
 
 .forget, .signup{
     margin-bottom: 12px;
 }
 .or{
     margin-bottom: 17px;
-}
+    } */
+    /* button:hover {
+       background: #2563eb;
+    } */

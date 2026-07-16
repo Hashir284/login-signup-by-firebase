@@ -1,21 +1,85 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Jost:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
   }
-  
-  body {
-  font-family: 'Jost', 'Inter', 'Open Sans', sans-serif;
-  padding: 25px;
-    min-height: 100vh;
+
+  #root,body{
+    width: 100%;
     display: flex;
     justify-content: center;
-    align-items: center;
-    background: #f3f4f6;
+  }
+  
+  body {
+  font-family: 'Roboto', 'Inter', 'Open Sans', sans-serif;
+  /* padding: 25px; */
+  min-height: 100vh;
+  /* display: flex;
+  justify-content: center;
+  align-items: center; */
+  background: #f3f4f6;
 } 
+
+.card{
+  font-family:'Open Sans', 'Jost','Roboto', 'Inter',  sans-serif;
+}
+
+.pofileName{
+  font-family: 'Jost','Roboto', 'Inter', 'Open Sans', sans-serif;
+}
+
+.max-width-1400px{
+  max-width: 1500px;
+  width: 100%;
+}
 
 input, button{
  font-family:'Open Sans','Inter', sans-serif; 
 }
 
+.inputContainer{
+  transition: 0.1s all ease;
+}
+
+.inputContainer:focus-within {
+  outline: 1px solid #3B82F6;
+  outline-offset: -1px;
+}
+
+.or{
+  width: 100%;
+  position: relative;
+}
+
+.or::before{
+  position: absolute;
+  top: 48%;
+  right: 0;
+  content: '';
+  width: 43%;
+  border-radius: 20px;
+  height: 1px;
+  background-color: #475569;
+}
+.or::after{
+  position: absolute;
+  top: 48%;
+  left: 0;
+  content: '';
+  width: 43%;
+  border-radius: 20px;
+  height: 1px;
+  background-color: #475569;
+}
+
+.create{
+  width: 100%;
+  max-width: 430px;
+}
+
+.card{
+  /* box-shadow: rgba(67, 71, 85, 0.27) 0px 0px 0.25em, rgba(90, 125, 188, 0.05) 0px 0.25em 1em; */
+  /* box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px; */
+}

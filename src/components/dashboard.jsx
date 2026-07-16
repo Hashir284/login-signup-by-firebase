@@ -1,83 +1,144 @@
-import { getAuth, sendEmailVerification } from "firebase/auth";
-import "./CSS/dashboard.css";
-import { Link } from "react-router";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { getDoc, getFirestore, orderBy } from "firebase/firestore";
+import {
+  doc,
+  setDoc,
+  serverTimestamp,
+  query,
+  where,
+  getDocs,
+  collection,
+  addDoc,
+} from "firebase/firestore";
+import { db } from "../initializeApp";
+import { getAuth } from "firebase/auth";
+import Post from "./post";
+import axios from "axios";
+import { faDevpost } from "@fortawesome/free-regular-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFileArrowUp } from "@fortawesome/free-solid-svg-icons";
+import { faUnity } from "@fortawesome/free-brands-svg-icons";
 
-const Dashboard = ({ change }) => {
+const Dashboard = () => {
+  const [postDetails, spostDetails] = useState([]);
+  const [postImage, sPostImage] = useState("");
+  const [postTitle, sPostTitle] = useState("");
+  
+  useEffect(() => {
+    getData();
+  }, []);
+
   const auth = getAuth();
-  const id = auth.currentUser.uid;
-  const email = auth.currentUser.email;
-  const [emailVerified, semailVerified] = useState(
-    auth.currentUser.emailVerified,
-  );
-  console.log(auth.currentUser.photoURL);
 
-  const verify = () => {
-    sendEmailVerification(auth.currentUser)
-      .then(() => {
-        alert("Check your Email");
-      })
-      .catch((error) => {
-        console.log(error);
-        alert("Check your Email");
+  const fireStoreData = async () => {
+    if (!postImage || !postTitle){
+    alert('Plz! fill all feilds')
+    return
+  }
+  const formData = new FormData();
+
+  formData.append("file", postImage);
+  console.log(postImage);
+  
+  formData.append("upload_preset", "upload_preset");
+
+  try {
+    const res = await axios.post(
+      "https://api.cloudinary.com/v1_1/dl4g6bgml/upload",
+      formData
+    );
+
+    console.log(res);
+
+    let obj = {
+      email: auth?.currentUser?.email,
+      currentUser: auth?.currentUser?.displayName,
+      photoURL: auth?.currentUser?.photoURL,
+      Id: auth?.currentUser?.uid,
+      postImage: res.data.url,
+      postTitle,
+      createdAt: serverTimestamp()
+    };
+    await addDoc(collection(db, "Posts"), obj);
+      spostDetails(prev=> [obj, ...prev])
+  } catch (err) {
+    console.log(err.response?.data || err.message );
+  }
+};
+
+  const enterData = (e) => {
+    e.preventDefault();
+    fireStoreData();
+  };
+
+  const getData = async () => {
+    try {
+      const q = query(collection(db, "Posts"), orderBy("createdAt", "desc"));
+      const querySnapshot = await getDocs(q);
+      let obj = []
+      querySnapshot.forEach((doc) => {
+        obj.push({ id: doc.id, ...doc.data() })
       });
-    if (!emailVerified) {
-      setInterval(() => {
-        semailVerified(auth.currentUser.emailVerified);
-        console.log(auth.currentUser.emailVerified);
-      }, 300);
+      spostDetails(obj)
+    } catch (err) {
+      console.log(err.code);
+      console.log('err', err.message);
     }
   };
 
   return (
-    <div>
-      <div className="card">
-        <div className="grey"></div>
-        {auth.currentUser.photoURL ? <div className="shade-green"></div> : null}
-        <div className="details">
-          <h2>{auth.currentUser.displayName}</h2>
-          {auth.currentUser.photoURL ? (
-            <img src={auth.currentUser.photoURL} alt="User Profile" referrerPolicy="no-referrer" loading="lazy"
-  onError={(e) => {
-    e.target.src = "/4.png";
-  }} />
-          ) : null}
-          <p>
-            Email: <span>{email}</span>
-          </p>
-          <p>
-            Email Verify: <span>{emailVerified ? "Verified" : "Not "}</span>
-          </p>
-          <p>
-            Uid: <span>{id}</span>
-          </p>
-          <button onClick={change}>Logout</button>
-          <br />
-          <span className="links">
-            <Link to="./verifyYourEmail">
-              {auth.currentUser.photoURL
-                ? "Edit your profile picture"
-                : "Upload your profile picture"}
-            </Link>
-            <br />
-            <br />
-
-            {auth.currentUser.emailVerified && auth.currentUser.photoURL ? (
-              <Link to="/home">Go to Home Page </Link>
-            ) : (
-              <div>Please Verify your Account to Home Page</div>
-            )}
-          </span>
-          {!emailVerified ? (
-            <p>
-              Email verification is pending.
-              <button className="verify" onClick={verify}>
-                Verify now
-              </button>
-            </p>
-          ) : null}
+    <div className="home w-full justify-center items-center flex flex-col py-12 px-4">
+      <form onSubmit={enterData} className="create rounded-xl bg-loginconbg login pt-8 pb-9 px-9 mb-12">
+        <div className="mb-4">
+          <label htmlFor="" className="text-secondary mb-2 text-base inline-block">Upload your Image</label>
+          <div className="inputContainer flex gap-2 items-center px-3 mx-0 mb-4 text-inputBorder border-2 w-full rounded-md">
+          <FontAwesomeIcon icon={faFileArrowUp} style={{color: "#475569",}} />
+          <input
+          className="focus:outline-none text-input py-3 text-base"
+            type="file"
+            placeholder="Upload your File"
+            id="File"
+              onChange={(e) => sPostImage(e.target.files[0])}
+          />
         </div>
-        <div className="grey"></div>
+        </div>
+        <div className="mb-6">
+          <label htmlFor="" className="text-secondary mb-2 text-base inline-block">Post Title</label>
+          <div className="inputContainer flex gap-2 items-center px-3 mx-0 mb-4 text-inputBorder border-2 w-full rounded-md">
+                  <FontAwesomeIcon icon={faUnity} style={{color: "#475569",}} />
+                  <input  
+                  className="focus:outline-none w-full py-3 text-input text-base"
+                    type="text"
+                    value={postTitle}
+                    placeholder="Enter your post title"
+                    id="title"
+                    onChange={(e) => {
+                      sPostTitle(e.target.value);
+                    }}
+                  />
+                </div>
+        </div>
+        <div>
+          <button type={"submit"} className="hover:bg-buttonHover transition-all inline-block w-full bg-button font-semibold text-white py-3 rounded-lg">
+            Add
+            </button>
+        </div>
+      </form>
+
+      <div className="post grid grid-cols-1 gap-x-5 gap-y-12 ">
+        {postDetails.map((e, i) => {
+          return (
+            <Post
+              image={e.postImage}
+              title={e.postTitle}
+              user={e.currentUser}
+              porfileImage={e.photoURL}
+              id={e.id}
+              key={i}
+            />
+          );
+        })}
+
       </div>
     </div>
   );

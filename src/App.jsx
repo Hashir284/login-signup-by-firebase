@@ -2,11 +2,11 @@ import "./App.css";
 import Login from "./components/login";
 import Signup from "./components/signup";
 import Dashboard from "./components/dashboard";
+import UpdateProfile from "./components/UpdateProfile";
 import Forget from "./components/forget";
 import { Navigate, Route, Routes } from "react-router";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useEffect, useState } from "react";
-import VerifyYourEmail from "./components/verifyYourEmail";
 import auth from "./initializeApp";
 import Home from "./components/home";
 
@@ -40,20 +40,20 @@ function App() {
   };
 
   if (userLoggedIn === null) {
-    return <h1>Loading</h1>;
+      return (<div className="App w-full flex justify-center items-center h-screen">
+         <h1>Loading</h1>;
+      </div>)
   }
  
   return (
-    <div className="App">
-      {userLoggedIn ? (
+    <div className="App max-width-1400px bg-loginbg w-full ">
+        {userLoggedIn ? (
         <Routes>
-          <Route path="/" element={<Dashboard change={change} />} />
-          <Route path="/verifyYourEmail" element={<VerifyYourEmail/>} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
+          <Route path="/" element={<Home change={change} />} />
+          <Route path="/UpdateProfile" element={<UpdateProfile />} />
           <Route path="*" element={<Navigate to={"/"} />} />
           {auth.currentUser.emailVerified && auth.currentUser.photoURL
-                ? <Route path="/home" element={<Home />} />
+                ? <Route path="/dashboard" element={<Dashboard />} />
                 : null}
         </Routes>
       ) : (
@@ -64,7 +64,7 @@ function App() {
           <Route path="*" element={<Navigate to={"/"} />} />
         </Routes>
       )}
-    </div>
+      </div>
   );
 }
 
