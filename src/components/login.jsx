@@ -11,7 +11,6 @@ const Login = () => {
   const [password, spassword] = useState("");
   const navigate = useNavigate();
   const auth = getAuth();
-  const provider = new GoogleAuthProvider();
 
   const checkTrim = () => {
     if (email.trim() === "" || password.trim() === "") {
@@ -42,79 +41,86 @@ const Login = () => {
     }
   };
 
-  const contineWithGoogle = () =>{
-    const provider = new GoogleAuthProvider()
-signInWithPopup(auth, provider)
-  .then((result) => {
-    const credential = GoogleAuthProvider.credentialFromResult(result);
-    const token = credential.accessToken;
-    const user = result.user;
-    navigate('/')
-  }).catch((error) => {
-    console.log(error)
-  });
-  }
+  const contineWithGoogle = () => {
+    const provider = new GoogleAuthProvider();
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        navigate('/');
+      }).catch((error) => {
+        console.log(error);
+      });
+  };
   
   return (
-    <div className="w-full min-h-full flex justify-center items-center">
-      <div className="create rounded-xl mx-5 m-10 bg-loginconbg login pt-10 pb-11 px-9">
-        <div className="text-center  flex flex-col justify-center items-center">
-        <h2 className="text-3xl font-extrabold mb-2 text-primary">Welcome Back</h2>
-      <p className="text-secondary mb-1">Login to your account to continue</p>
-      <img src="login.png" alt="" className="w-64 relative right-1 inline-block mb-3" />
-      </div>
-      <form onSubmit={submitData} autoComplete="off">
-
-        <div className="inputContainer flex gap-2 items-center px-3 mx-0 mb-4 text-inputBorder border-2 w-full rounded-md">
-          <FontAwesomeIcon icon={faEnvelope} style={{color: "#475569",}} />
-          <input
-          className="focus:outline-none py-3 text-input text-base"
-            type="email"
-            value={email}
-            placeholder="Email"
-            id="email"
-            onChange={(e) => {
-              semail(e.target.value);
-            }}
-          />
+    <div className="w-full min-h-screen flex justify-center items-center p-4 box-border">
+      <div 
+        className="w-full rounded-xl bg-loginconbg login pt-8 pb-10 px-6 sm:px-9 mx-auto shadow-xl"
+        style={{ maxWidth: "420px" }}
+      >
+        <div className="text-center flex flex-col justify-center items-center">
+          <h2 className="text-2xl sm:text-3xl font-extrabold mb-2 text-primary">Welcome Back</h2>
+          <p className="text-sm sm:text-base text-secondary mb-4">Login to your account to continue</p>
+          <img src="login.png" alt="" className="w-44 sm:w-64 max-w-full h-auto mb-4 object-contain" />
         </div>
-        <div className="inputContainer flex gap-2 items-center px-3 mx-0 mb-2 text-inputBorder border-2 w-full rounded-md">
-          <FontAwesomeIcon icon={faUnlockKeyhole} style={{color: "#475569",}} />
-          <input
-          className="focus:outline-none py-3 text-input text-base"
-            type="password"
-            value={password}
-            onChange={(e) => {
-              spassword(e.target.value);
-            }}
-            placeholder="Password"
-            id="password"
-          />
+
+        <form onSubmit={submitData} autoComplete="off">
+          <div className="inputContainer flex gap-3 items-center px-3 mb-4 text-inputBorder border-2 w-full rounded-md bg-transparent box-border">
+            <FontAwesomeIcon icon={faEnvelope} style={{color: "#475569"}} />
+            <input
+              className="focus:outline-none py-3 text-input text-sm sm:text-base bg-transparent w-full"
+              type="email"
+              value={email}
+              placeholder="Email"
+              id="email"
+              onChange={(e) => semail(e.target.value)}
+            />
           </div>
 
-        <div className="flex justify-between mb-5">
-         <label htmlFor="remember" className="text-secondary flex gap-1 items-center justify-start"><input type="Checkbox" placeholder="rem" className="h-3 w-3" id="remember"/>
-         <span>Remember me</span>
-         </label>
-          <div className="forget"><Link to={"/forget"} className="text-button hover:text-buttonHover hover:underline">Forget Password?</Link></div>
-        </div>
-        
+          <div className="inputContainer flex gap-3 items-center px-3 mb-4 text-inputBorder border-2 w-full rounded-md bg-transparent box-border">
+            <FontAwesomeIcon icon={faUnlockKeyhole} style={{color: "#475569"}} />
+            <input
+              className="focus:outline-none py-3 text-input text-sm sm:text-base bg-transparent w-full"
+              type="password"
+              value={password}
+              onChange={(e) => spassword(e.target.value)}
+              placeholder="Password"
+              id="password"
+            />
+          </div>
 
-        <div>
-          <button type={"submit"} className="hover:bg-buttonHover transition-all  mb-6  inline-block w-full bg-button font-semibold text-white py-3 rounded-lg">
+          <div className="flex justify-between items-center mb-6 text-xs sm:text-sm gap-2">
+            <label htmlFor="remember" className="text-secondary flex gap-2 items-center cursor-pointer select-none whitespace-nowrap">
+              <input type="checkbox" className="h-4 w-4 rounded accent-button cursor-pointer" id="remember"/>
+              <span>Remember me</span>
+            </label>
+            <div className="forget whitespace-nowrap">
+              <Link to={"/forget"} className="text-button hover:text-buttonHover hover:underline transition-colors">
+                Forget Password?
+              </Link>
+            </div>
+          </div>
+
+          <button type="submit" className="hover:bg-buttonHover transition-all mb-4 w-full bg-button font-semibold text-white py-3 rounded-lg text-sm sm:text-base cursor-pointer">
             Login
-            </button>
-        </div>
-      </form>
+          </button>
+        </form>
 
-            <div className="link text-secondary text-center">
-                    Don't have an account?<Link to={"/signup"} className="text-loginLink hover:text-buttonHover hover:underline transition-all"> Sign up</Link>
-                  </div>
-                    <div>
-                      <div className="or text-center mt-3 text-secondary">OR</div>
-                      <button onClick={contineWithGoogle} className="hover:bg-buttonHover transition-all mt-5  inline-block w-full bg-button font-semibold text-white py-3 rounded-lg">Continue With Google</button>
-                    </div>
-                  </div>
+        <div className="link text-secondary text-center text-xs sm:text-sm mt-4">
+          Don't have an account? 
+          <Link to={"/signup"} className="text-loginLink hover:text-buttonHover hover:underline transition-all font-medium ml-1">
+            Sign up
+          </Link>
+        </div>
+
+        <div className="flex items-center my-4 before:flex-1 before:border-t before:border-slate-700/50 after:flex-1 after:border-t after:border-slate-700/50 text-center text-xs sm:text-sm font-medium text-slate-500 uppercase tracking-wider">
+          <span className="px-3">OR</span>
+        </div>
+
+        <button onClick={contineWithGoogle} className="hover:bg-buttonHover transition-all w-full bg-button font-semibold text-white py-3 rounded-lg text-sm sm:text-base cursor-pointer">
+          Continue With Google
+        </button>
+
+      </div>
     </div>
   );
 };

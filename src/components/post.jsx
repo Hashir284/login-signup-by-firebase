@@ -1,192 +1,203 @@
 import React, { useEffect, useState } from "react";
 import "./CSS/postCard.css";
-import { collection, addDoc, updateDoc, setDoc, doc, getDocs, query, where } from "firebase/firestore";
-import auth, { db } from "../initializeApp";
-import { getDoc } from "firebase/firestore";
+import { collection, addDoc, setDoc, doc, getDocs, query, where } from "firebase/firestore";
+import { db } from "../initializeApp";
 import { faThumbsUp } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsis } from '@fortawesome/free-solid-svg-icons';
-import { all } from "axios";
 import { getAuth } from "firebase/auth";
 
-
 const Post = ({ image, title, user, porfileImage, id }) => {
+  const auth = getAuth();
+  const currentUser = auth.currentUser;
 
-  const auth = getAuth()
+  const [eachLike, setEachLike] = useState(false);
+  const [totalLikes, setTotalLikes] = useState(0);
 
-  const [eachLike, setEachLike] = useState(false)
-  const [totalLikes, setTotalLikes] = useState(null)
+  const [eachComment, setEachComment] = useState('');
+  const [allComments, setAllComments] = useState([]);
+  const [showComments, setShowComments] = useState(false);
 
-  const [eachComment, setEachComment] = useState('')
-  const [allComments, setAllComments] = useState([])
-  const [showComments, setShowComments] = useState(false)
+  useEffect(() => {
+    if (!id || !currentUser) return;
 
-  useEffect(()=>{
-    async function getTotalLikes (){
-      const q = query(collection(db, `Posts/${id}/Likes`), where("like", "==", true));
-      let allLikes = []
-      const querySnapshot = await getDocs(q);
-      querySnapshot.forEach((doc) => {
-  // doc.data() is never undefined for query doc snapshots
-  console.log(doc.id, " => ", doc.data());
-  if(doc.id === auth.currentUser.email){
-    setEachLike(true)
-  }
-  allLikes.push(doc.data())
-});
+    async function getTotalLikes() {
+      try {
+        const q = query(collection(db, `Posts/${id}/Likes`), where("like", "==", true));
+        const querySnapshot = await getDocs(q);
+        let allLikes = [];
+        
+        querySnapshot.forEach((doc) => {
+          if (doc.id === currentUser.email) {
+            setEachLike(true);
+          }
+          allLikes.push(doc.data());
+        });
 
-setTotalLikes(allLikes.length)
-}
-getTotalLikes()
-
-getComments()
-  },[])
-  // useEffect(() => {
-  //   // getTotalLikes()
-  // }, [])
-  //     async function getTotalLikes() {     
-  //       const q = query(collection(db, "Posts/id/Likes"), where("Like", "==", true));
-  // const querySnapshot = await getDocs(q);
-  // let allLikes = []
-  // querySnapshot.forEach((doc) => {
-  //   // doc.data() is never undefined for query doc snapshots
-  //   console.log(doc.id, " => ", doc.data());
-  //   if(doc.data().like){
-  //     allLikes.push({...doc.data(), id:doc.id})
-  //   }
-  // });
-  // if(allLikes.id === auth.currentUser.email){
-  //   setTotalLikes(allLikes || 0)
-  //   setEachLike(true)
-  // }else{
-  //   setTotalLikes(allLikes || 0)
-  //   setEachLike(false)
-  // }
-  //     }
-
-  //     const manageLikes = async ()=>{
-  //       let totalLikeManage
-  //         if(eachLike){
-  //         totalLikeManage = totalLikes+1
-  //       }else if(totalLikes === 0){
-  //         // setTotalLikes(totalLikes)
-  //       }else{
-  //         totalLikeManage = totalLikes-1
-  //       }
-  //       setTotalLikes(totalLikeManage)
-
-  //       await setDoc(doc(db, `Posts/${id}/Likes`,auth.currentUser.email), {
-  //   like:eachLike
-  // });
-  //       }      
-
-  async function like() {
-    let newLike = !eachLike
-    setEachLike(newLike)
-    if (newLike) {
-      setTotalLikes(prev=> prev + 1)
-    } else {
-      if(totalLikes !== 0){
-        setTotalLikes(prev=> prev - 1)
+        setTotalLikes(allLikes.length);
+      } catch (err) {
+        console.error(err);
       }
     }
-    await setDoc(doc(db, `Posts/${id}/Likes`, auth.currentUser.email), {
-      like: newLike
-    });
+
+    getTotalLikes();
+    getComments();
+  }, [id, currentUser]);    
+
+  async function like() {
+    if (!currentUser) return;
+
+    let newLike = !eachLike;
+    setEachLike(newLike);
+    
+    if (newLike) {
+      setTotalLikes(prev => prev + 1);
+    } else {
+      setTotalLikes(prev => (prev > 0 ? prev - 1 : 0));
+    }
+
+    try {
+      await setDoc(doc(db, `Posts/${id}/Likes`, currentUser.email), {
+        like: newLike
+      });
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   async function addComment() {
-    // Add a new document with a generated id.
-    if (eachComment.trim() !== '') {
-      setAllComments([...allComments, { user: auth.currentUser.displayName, eachComment }])
+    if (!currentUser || eachComment.trim() === '') return;
+
+    const commentText = eachComment;
+    const commentUser = currentUser.displayName || "Anonymous";
+
+    setEachComment('');
+
+    try {
       const docRef = await addDoc(collection(db, `Posts/${id}/Comments`), {
-        user: auth.currentUser.displayName, eachComment,
+        user: commentUser,
+        eachComment: commentText,
+        createdAt: new Date().toISOString()
       });
-      console.log("Document written with ID: ", docRef);
-    }
-    else {
-      console.log(1);
+
+      setAllComments(prev => [...prev, { id: docRef.id, user: commentUser, eachComment: commentText }]);
+    } catch (err) {
+      console.error(err);
     }
   }
 
-  async function getComments(params) {
-    const q = query(collection(db, `Posts/${id}/Comments`));
-
-    const querySnapshot = await getDocs(q);
-    let allComment = []
-    querySnapshot.forEach((doc) => {
-      // doc.data() is never undefined for query doc snapshots
-      allComment.push({ id: doc.id, ...doc.data() })
-      console.log(doc.id, " => ", doc.data());
-    });
-    setAllComments([...allComment])
+  async function getComments() {
+    try {
+      const q = query(collection(db, `Posts/${id}/Comments`));
+      const querySnapshot = await getDocs(q);
+      let allComment = [];
+      
+      querySnapshot.forEach((doc) => {
+        allComment.push({ id: doc.id, ...doc.data() });
+      });
+      
+      setAllComments(allComment);
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   return (
-    <div className="card w-full max-w-96 p-6 pb-4 bg-loginconbg rounded-lg text-primary">
-      <div className="mb">
-        <div className="flex justify-between">
-          <div className="profileId flex gap-3">
-            <div>
-              <img src={porfileImage} alt="profile" className="porfileImage rounded-full w-14 h-14"
-                referrerPolicy="no-referrer" loading="lazy"
+    <div className="card text-primary w-full max-w-md p-4 sm:p-6 pb-4 bg-loginconbg rounded-xl shadow-lg box-border">
+      
+      <div className="mb-4">
+        <div className="flex justify-between items-center">
+          <div className="profileId flex gap-3 items-center">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 flex-shrink-0">
+              <img 
+                src={porfileImage || "/4.png"} 
+                alt="profile" 
+                className="rounded-full w-full h-full object-cover border border-slate-700"
+                referrerPolicy="no-referrer" 
+                loading="lazy"
                 onError={(e) => {
                   e.target.src = "/4.png";
                 }}
               />
             </div>
-            <div className="font-semibold text-lg">{user}</div>
+            <div className="font-bold text-base sm:text-lg truncate max-w-[180px] sm:max-w-[240px]">{user || "Anonymous"}</div>
           </div>
-          <div>
-            <FontAwesomeIcon icon={faEllipsis} className="text-secondary" />
-          </div>
+          <button className="text-secondary p-1 hover:text-white transition-colors cursor-pointer bg-transparent border-none">
+            <FontAwesomeIcon className="text-secondary" icon={faEllipsis} />
+          </button>
         </div>
       </div>
-      <div className="mb-2 ml-1">{title}</div>
-      <div className="w-full border-2 rounded-md overflow-hidden">
-        <img src={image} alt="post" className="postImage w-full h-80"
-          referrerPolicy="no-referrer" loading="lazy"
+
+      <div className="mb-3 text-sm sm:text-base break-words px-1">{title}</div>
+      
+      <div className="w-full border border-slate-800 rounded-lg overflow-hidden bg-black/20 flex justify-center items-center">
+        <img 
+          src={image} 
+          alt="post" 
+          className="w-full h-64 sm:h-80 object-cover"
+          referrerPolicy="no-referrer" 
+          loading="lazy"
           onError={(e) => {
             e.target.src = "/default-image.png";
           }}
         />
       </div>
-      <div className="flex flex-row justify-between items-center gap-7 px-3 pt-6 mx-6">
-        <div>
-          {
-            eachLike ?
-              <div className='flex gap-1 justify-center items-center cursor-pointer' onClick={like}><img src="blacklike.png" alt="" />{totalLikes || 0}</div>
-              : <div className='flex gap-1 justify-center items-center cursor-pointer' onClick={like}><FontAwesomeIcon icon={faThumbsUp} /> {totalLikes || 0}</div>
-          }
-        </div>
-        <div className='flex gap-1 cursor-pointer' onClick={() => setShowComments(!showComments)}><img src="chat.png" alt="" /> Comments</div>
+
+      <div className="flex flex-row justify-between items-center gap-4 px-2 pt-4 border-t border-slate-800 mt-4 text-sm sm:text-base">
+        <button 
+          onClick={like} 
+          className="flex gap-2 justify-center items-center cursor-pointer bg-transparent border-none text-white hover:text-button transition-colors"
+        >
+          {eachLike ? (
+            <img src="blacklike.png" alt="liked" className="w-5 h-5 object-contain filter" />
+          ) : (
+            <FontAwesomeIcon icon={faThumbsUp} className="w-5 text-secondary h-5" />
+          )}
+          <span className="font-semibold text-primary">{totalLikes}</span>
+        </button>
+
+        <button 
+          onClick={() => setShowComments(!showComments)} 
+          className="flex gap-2 justify-center items-center cursor-pointer bg-transparent border-none text-white hover:text-button transition-colors font-semibold"
+        >
+          <img src="chat.png" alt="comments" className="w-5 h-5 object-contain filter invert" /> 
+          <span className="text-primary">Comments</span>
+        </button>
       </div>
-      {
-        showComments ?
-          <>
-            <div className="flex flex-col g-4 mb-1 mt-6">
-              <div className="inputContainer flex justify-between gap-2 items-center pr-0 pl-3 mb-4 text-inputBorder border-2 w-full rounded-md">
-                <input onChange={e => setEachComment(e.target.value)} className="input w-full focus:outline-none py-3 text-input text-base" name="comment" type="text" placeholder="Enter the Comment" />
-                <div className="mr-1">
-                  <button onClick={addComment} className="hover:bg-buttonHover transition-all inline-block w-full bg-button font-semibold text-white py-2 px-4 rounded-lg">
-                    Add
-                  </button>
-                </div>
+
+      {showComments && (
+        <div className="w-full transition-all">
+          <div className="flex flex-col mb-2 mt-4">
+            <div className="inputContainer flex justify-between gap-2 items-center pr-1 pl-3 bg-transparent text-inputBorder border-2 w-full rounded-md box-border">
+              <input 
+                value={eachComment}
+                onChange={e => setEachComment(e.target.value)} 
+                className="w-full text-secondary focus:outline-none py-2.5 bg-transparent text-sm sm:text-base" 
+                name="comment" 
+                type="text" 
+                placeholder="Write a comment..." 
+                onKeyDown={(e) => e.key === 'Enter' && addComment()}
+              />
+              <button 
+                onClick={addComment} 
+                className="hover:bg-buttonHover transition-all bg-button font-semibold text-white py-2 px-4 rounded-lg text-xs sm:text-sm cursor-pointer whitespace-nowrap"
+              >
+                Add
+              </button>
+            </div>
+          </div>
+
+          <div className="mt-4 space-y-2 max-h-60 overflow-y-auto pr-1">
+            {allComments.map((e) => (
+              <div className="flex flex-col sm:flex-row sm:gap-2 items-start px-3 py-2.5 bg-slate-100/60 border border-slate-200 rounded-lg break-words w-full box-border" key={e.id || Math.random()}>
+                <h4 className="font-bold text-primary text-xs sm:text-sm mb-0.5">{e.user}: </h4>
+                <p className="leading-snug text-secondary text-xs sm:text-sm m-0">{e.eachComment}</p>
               </div>
-            </div>
-            <div className="mb-1">
-              {
-                allComments.map((e, i) => {
-                  return <div className="flex items-start gap-3 mb-2 px-3 py-3 bg-slate-100 rounded-lg" key={i}>
-                    <h3 className="font-bold text-input">{e.user}:</h3>
-                    <p className="leading-tight text-secondary" style={{ marginTop: '2px' }}>{e.eachComment}</p>
-                  </div>
-                })
-              }
-            </div>
-          </>
-          : null
-      }
+            ))}
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };
